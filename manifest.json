@@ -1,0 +1,14 @@
+{
+    "id": "risu-realm-plus",
+    "name": "RisuAI Realm Plus",
+    "version": "0.1.0",
+    "author": "DJLegends",
+    "description": "RisuAI's character hub as a source, keeping what a plain charx import drops: the card's Risu module is stored beside it, and its regex is translated into the standard card field. Switch off the bundled RisuAI Realm when using this.",
+    "requires": { "api": 2 },
+    "defaultOff": true,
+    "provider": true,
+    "extNamespace": "risu-realm-plus",
+    "settings": { "nsfw": false },
+    "client": "client/index.js",
+    "server": "server/index.js"
+}

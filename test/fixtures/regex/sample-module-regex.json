@@ -1,0 +1,10 @@
+[
+    { "comment": "Fix ellipses", "in": "\\.{4,}", "out": "...", "type": "editoutput", "ableFlag": true, "flag": "g" },
+    { "comment": "Strip OOC", "in": "\\(OOC:[^)]*\\)", "out": "", "type": "editinput", "ableFlag": false, "flag": "" },
+    { "comment": "Status box", "in": "\\[status\\](.+?)\\[/status\\]", "out": "<div class=\"box\">$1</div>", "type": "editdisplay", "ableFlag": true, "flag": "gs" },
+    { "comment": "Hide notes from prompt", "in": "<note>.*?</note>", "out": "", "type": "editprocess", "ableFlag": true, "flag": "gs" },
+    { "comment": "Mood tag", "in": "\\[mood:(\\w+)\\]", "out": "@@emo $1", "type": "editoutput", "ableFlag": false, "flag": "" },
+    { "comment": "Late rule", "in": "foo", "out": "bar", "type": "editoutput", "ableFlag": true, "flag": "g<order 5>" },
+    { "comment": "Unused", "in": "x", "out": "y", "type": "disabled", "ableFlag": false, "flag": "" },
+    { "comment": "Wave", "in": "~~", "out": "{{user}} waves {{#if {{getvar::x}}}}!{{/if}}", "type": "editdisplay", "ableFlag": false, "flag": "" }
+]

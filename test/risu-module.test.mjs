@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import zlib from 'node:zlib';
 import {
-    decodeRisum, readCharxMember, readModuleFromCharx, RisuModuleError, MAX_MODULE_JSON,
+    decodeRisum, readCharxMember, readModuleFromCharx, RisuModuleError, MAX_MODULE_JSON, MAX_MODULE_FILE,
 } from '../server/risu-module.js';
 
 const ENCODE = (await fs.readFile(new URL('../server/rpack-map.bin', import.meta.url))).subarray(0, 256);
@@ -247,4 +247,12 @@ test('a member past 4 GiB in the file (zip behind a sparse prefix)', async (t) =
         await fh?.close();
         await fs.rm(file, { force: true });
     }
+});
+
+test('the module caps are at most 64 MB, and a module.risum over the file cap is refused unread', async () => {
+    assert.ok(MAX_MODULE_FILE <= 64 * 1024 * 1024);
+    assert.ok(MAX_MODULE_JSON <= MAX_MODULE_FILE);
+    const big = buildZip([{ name: 'card.json', data: '{}' }, { name: 'module.risum', data: Buffer.alloc(MAX_MODULE_FILE + 1) }]);
+    const file = await put('over-cap.charx', big);
+    await assert.rejects(() => readModuleFromCharx(file), (e) => e instanceof RisuModuleError && /byte limit/.test(e.message));
 });

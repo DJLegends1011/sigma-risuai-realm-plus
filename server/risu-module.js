@@ -10,9 +10,11 @@ export class RisuModuleError extends Error {
     }
 }
 
-// a pretty-printed module with a big lorebook is a few MB; this only stops a lying length
-export const MAX_MODULE_JSON = 64 * 1024 * 1024;
-export const MAX_MODULE_FILE = 256 * 1024 * 1024;
+// a pretty-printed module with a big lorebook is a few MB; these only stop a lying length. The whole
+// module.risum is read into memory (on a phone), so the file cap is the memory bound; the JSON inside
+// it can be no larger than the file.
+export const MAX_MODULE_FILE = 64 * 1024 * 1024;
+export const MAX_MODULE_JSON = MAX_MODULE_FILE;
 
 // the central directory is read whole, so it gets a cap too
 const MAX_CENTRAL_DIRECTORY = 64 * 1024 * 1024;

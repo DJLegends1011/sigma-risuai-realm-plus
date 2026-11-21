@@ -11,11 +11,11 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const EXT_DIR = path.resolve(__dirname, '..');
 const KIT = [
+    process.env.SIGMA_DIR && path.resolve(process.env.SIGMA_DIR, 'tools/extension-kit/index.mjs'),
     path.resolve(__dirname, '../../../../ProjectSigma-main/tools/extension-kit/index.mjs'),
     path.resolve(__dirname, '../../../../../ProjectSigma-main/tools/extension-kit/index.mjs'),
     'D:/ProjectSigma-main/tools/extension-kit/index.mjs',
-    '/data/data/com.termux/files/home/ProjectSigma-main/tools/extension-kit/index.mjs',
-].find(p => fs.existsSync(p));
+].filter(Boolean).find(p => fs.existsSync(p));
 const { startSigma, basePng } = await import(pathToFileURL(KIT).href);
 const REGEX_DIR = path.resolve(path.dirname(KIT), '../../extensions/installed/regex');
 const HAS_REGEX = fs.existsSync(path.join(REGEX_DIR, 'manifest.json'));

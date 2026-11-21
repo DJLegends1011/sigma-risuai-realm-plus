@@ -59,9 +59,15 @@ export function setRealmSettings(settings) {
 // LOCAL LIBRARY LOOKUP
 // ========================================
 
+// Sigma 1.2.0 asks the server through hitMatchName; 1.1.3 still has isCharPossibleMatch
+function possibleMatch(row) {
+    if (typeof view.isHitPossibleMatch === 'function') return view.isHitPossibleMatch(row);
+    return view.isCharPossibleMatch(row.name || '', row.author || '');
+}
+
 function isCharPossibleMatchObj(row) {
     if (view.isHitInLibrary(row)) return false;
-    return view.isCharPossibleMatch(row.name || '', row.author || '');
+    return possibleMatch(row);
 }
 
 // ========================================
@@ -285,7 +291,7 @@ export function openRealmPreview(row) {
     // the import button, kept in step with the library while the preview is open
     const restampImport = () => {
         const inLibraryNow = view.isHitInLibrary(row);
-        view.stampImportButton(document.getElementById('realmImportBtn'), { inLibrary: inLibraryNow, possibleMatch: !inLibraryNow && view.isCharPossibleMatch(name, row.author || '') });
+        view.stampImportButton(document.getElementById('realmImportBtn'), { inLibrary: inLibraryNow, possibleMatch: !inLibraryNow && possibleMatch(row) });
     };
     restampImport();
     view.trackPreview(restampImport, row);

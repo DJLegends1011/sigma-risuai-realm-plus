@@ -413,7 +413,8 @@ test('a module.risum over the reader\'s file cap means no module; the import sti
     assert.deepEqual(tmpFiles(), []);
 });
 
-test('a download that cannot be written answers a clear error and leaves nothing behind', async () => {
+// chmod cannot make a folder read-only on Windows, so there the write never fails
+test('a download that cannot be written answers a clear error and leaves nothing behind', { skip: process.platform === 'win32' && 'chmod 0o500 does not block writes on Windows' }, async () => {
     downloads.set(ID(13), { bytes: charx({ card: cardOf({}, 'No Disk') }) });
     fs.mkdirSync(tmpDir(), { recursive: true });
     fs.chmodSync(tmpDir(), 0o500);

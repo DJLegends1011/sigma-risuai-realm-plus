@@ -197,9 +197,11 @@ function translateOne(raw, index) {
     const conv = convertOut(out, countGroups(raw.in), lossy);
     if (conv.skip) return { ...fail(conv.skip), hasOrder, order };
 
-    // CBS has no ST twin: an unexpanded macro is stray text, not breakage, so the script is kept
+    // CBS has no ST twin: a script whose output needs it goes on the card switched off, since its raw
+    // macros (and the markup around them) make a message worse than no script; the user can turn it on
     const macros = unsupportedMacros(conv.text);
     if (macros) lossy.add(`CBS macros left unexpanded by ST: ${macros}`);
+    const off = macros ? `its output needs Risu macros Sigma cannot run yet (${macros})` : null;
     if (/<(user|char|bot)>/i.test(conv.text)) lossy.add('<user>/<char>/<bot> are not expanded by ST');
     if (/<style[\s>]/i.test(raw.out)) lossy.add('<style> is not scoped or class-prefixed the way Risu does');
 
@@ -208,6 +210,7 @@ function translateOne(raw, index) {
         hasOrder,
         order,
         lossy: [...lossy],
+        off,
         script: {
             id: makeId(raw, index),
             scriptName: name,
@@ -215,7 +218,7 @@ function translateOne(raw, index) {
             replaceString: conv.text,
             trimStrings: [],
             placement: [...mode.placement],
-            disabled: false,
+            disabled: !!off,
             markdownOnly: mode.markdownOnly,
             promptOnly: mode.promptOnly,
             runOnEdit: false,
@@ -227,7 +230,7 @@ function translateOne(raw, index) {
 }
 
 export function translateRisuRegex(scripts) {
-    const report = { translated: 0, lossy: [], skipped: [] };
+    const report = { translated: 0, lossy: [], skipped: [], off: [] };
     if (!Array.isArray(scripts)) return { scripts: [], report };
 
     const done = [];
@@ -255,6 +258,7 @@ export function translateRisuRegex(scripts) {
     for (const r of done) {
         out.push(r.script);
         if (r.lossy.length) report.lossy.push({ name: r.name, reasons: r.lossy });
+        if (r.off) report.off.push({ name: r.name, reason: r.off });
     }
     report.translated = out.length;
     return { scripts: out, report };

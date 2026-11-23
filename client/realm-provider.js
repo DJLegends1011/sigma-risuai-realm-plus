@@ -33,6 +33,11 @@ function reportImport(staged, name) {
         parts.push(`${skipped.length} Risu regex script${skipped.length === 1 ? ' was' : 's were'} skipped`);
         console.info(`[RealmProvider] ${name}: skipped regex scripts:`, skipped);
     }
+    const off = staged.regexReport?.off || [];
+    if (off.length && !staged.regexReport?.tooLarge) {
+        parts.push(`${off.length} left switched off: ${off.length === 1 ? 'it needs' : 'they need'} Risu macros Sigma can't run yet`);
+        console.info(`[RealmProvider] ${name}: regex scripts put on the card switched off:`, off);
+    }
     if (staged.regexReport?.tooLarge) {
         parts.push('its regex was too large for the card');
         console.warn(`[RealmProvider] ${name}: translated regex over the card budget, none written:`, staged.regexReport.tooLarge);

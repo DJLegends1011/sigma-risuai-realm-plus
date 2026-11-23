@@ -21,7 +21,7 @@ const stParse = (s) => {
 
 test('non-array input and malformed entries never throw', () => {
     for (const bad of [undefined, null, 'x', 5, {}]) {
-        assert.deepEqual(translateRisuRegex(bad), { scripts: [], report: { translated: 0, lossy: [], skipped: [] } });
+        assert.deepEqual(translateRisuRegex(bad), { scripts: [], report: { translated: 0, lossy: [], skipped: [], off: [] } });
     }
     const r = translateRisuRegex([null, 'x', [], mk({ in: 5 }), mk({ out: undefined }), mk({ type: undefined })]);
     assert.equal(r.scripts.length, 0);
@@ -191,4 +191,16 @@ test('a hand-written module translates as a whole', () => {
     assert.equal(status.markdownOnly, true);
     // run the produced entry against sample text, the way ST would
     assert.equal('x [status]hi[/status]'.replace(stParse(status.findRegex), '<$1>'), 'x <hi>');
+});
+
+test('a script whose output needs CBS goes on the card switched off, and is reported', () => {
+    const r = translateRisuRegex([
+        mk({ comment: 'needs', out: '<img src="{{raw::$1}}">' }),
+        mk({ comment: 'st-only', out: '{{user}} and {{char}}' }),
+        mk({ comment: 'plain', out: 'b' }),
+    ]);
+    assert.deepEqual(r.scripts.map(s => [s.scriptName, s.disabled]), [['needs', true], ['st-only', false], ['plain', false]]);
+    assert.equal(r.report.translated, 3);
+    assert.deepEqual(r.report.off.map(o => o.name), ['needs']);
+    assert.match(r.report.off[0].reason, /\{\{raw\}\}/);
 });

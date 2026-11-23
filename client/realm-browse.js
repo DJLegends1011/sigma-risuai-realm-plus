@@ -65,6 +65,12 @@ function possibleMatch(row) {
     return view.isCharPossibleMatch(row.name || '', row.author || '');
 }
 
+// 1.2.0 tiers the badge through hitMatchName too, so the badge and the Import button agree
+function possibleTier(row, name, author) {
+    if (typeof view.possibleMatchTierFor === 'function') return view.possibleMatchTierFor(row);
+    return view.getPossibleMatchTier(name, author);
+}
+
 function isCharPossibleMatchObj(row) {
     if (view.isHitInLibrary(row)) return false;
     return possibleMatch(row);
@@ -80,7 +86,7 @@ export function realmCardHtml(row) {
     const author = row.author || '';
     const tags = row.tags;
     const inLibrary = view.isHitInLibrary(row);
-    const tier = inLibrary ? null : view.getPossibleMatchTier(name, author);
+    const tier = inLibrary ? null : possibleTier(row, name, author);
     const possible = !!tier?.show;
     const badges = view.importingBadge(row) + (inLibrary
         ? '<span class="browse-feature-badge in-library" title="In Your Library"><i class="fa-solid fa-check"></i></span>'
@@ -89,7 +95,7 @@ export function realmCardHtml(row) {
     const date = row.date ? new Date(row.date).toLocaleDateString() : '';
     const cardClass = inLibrary ? 'browse-card in-library' : possible ? 'browse-card possible-library' : 'browse-card';
     return `
-        <div class="${cardClass}" data-realm-id="${escapeHtml(row.id)}"${view.linkKeyAttr(row)}>
+        <div class="${cardClass}" data-realm-id="${escapeHtml(row.id)}"${view.linkKeyAttr(row)}${view.matchAttr?.(row) || ''}>
             <div class="browse-card-image">
                 <img data-src="${escapeHtml(picture)}" src="${IMG_PLACEHOLDER}" alt="${escapeHtml(name)}" decoding="async" fetchpriority="low" onerror="this.dataset.failed='1';this.src='/img/no-portrait.png'">
                 ${badges ? `<div class="browse-feature-badges">${badges}</div>` : ''}
